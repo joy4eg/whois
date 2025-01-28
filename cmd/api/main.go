@@ -60,7 +60,7 @@ func main() {
 
 	app := fiber.New()
 	app.Get("/", func(c fiber.Ctx) error {
-		c.Response().Header.Set("Content-Type", "text/html")
+		c.Response().Header.Set(fiber.HeaderContentType, fiber.MIMETextHTMLCharsetUTF8)
 		return c.SendString(appHTML)
 	})
 	app.Post("/whois", func(c fiber.Ctx) error {
