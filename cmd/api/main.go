@@ -17,33 +17,61 @@ const appHTML = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHOIS Lookup</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>WHOIS Lookup</title>
+	<style>
+		.spinner {
+			display: none;
+			width: 40px;
+			height: 40px;
+			border: 4px solid #f3f3f3;
+			border-top: 4px solid #3498db;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 20px auto;
+		}
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+	</style>
 </head>
 <body>
-    <h1>WHOIS Lookup</h1>
-    <form id="whois-form">
-        <label for="host">Host:</label>
-        <input type="text" id="host" name="host" required>
-        <button type="submit">whois</button>
-    </form>
-    <pre id="result"></pre>
-    <script>
-        document.getElementById('whois-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const host = document.getElementById('host').value;
-            const response = await fetch('/whois', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ host })
-            });
-            const result = await response.text();
-            document.getElementById('result').textContent = result;
-        });
-    </script>
+	<h1>WHOIS Lookup</h1>
+	<form id="whois-form">
+		<label for="host">Host:</label>
+		<input type="text" id="host" name="host" required>
+		<button type="submit">whois</button>
+	</form>
+	<div id="spinner" class="spinner"></div>
+	<pre id="result"></pre>
+	<script>
+		document.getElementById('whois-form').addEventListener('submit', async function(event) {
+			event.preventDefault();
+			const spinner = document.getElementById('spinner');
+			const result = document.getElementById('result');
+
+			spinner.style.display = 'block';
+			result.textContent = '';
+
+			const host = document.getElementById('host').value;
+			try {
+				const response = await fetch('/whois', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ host })
+				});
+				result.textContent = await response.text();
+			} catch (error) {
+				result.textContent = 'Error: ' + error.message;
+			} finally {
+				spinner.style.display = 'none';
+			}
+		});
+	</script>
 </body>
 </html>
 `
